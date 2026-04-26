@@ -6,12 +6,10 @@ from .models import Category, Article, Comment
 from .forms import ArticleForm, CommentForm
 from django.contrib.auth.forms import UserCreationForm
 
-# 1. Список категорій (з кількістю статей)
 def category_list(request):
     categories = Category.objects.annotate(articles_count=Count('articles'))
     return render(request, 'blog/category_list.html', {'categories': categories})
 
-# 2. Список статей (з сортуванням)
 def article_list(request):
     sort_by = request.GET.get('sort', 'date')
     if sort_by == 'comments':
@@ -39,11 +37,9 @@ def article_detail(request, pk):
 
     return render(request, 'blog/article_detail.html', {'article': article, 'form': form})
 
-# 4. Редагування статті (Авторизація + Ролі)
 @login_required
 def article_edit(request, pk):
     article = get_object_or_404(Article, pk=pk)
-    # Тільки автор або адміністратор!
     if request.user != article.author and not request.user.is_staff:
         raise PermissionDenied
     
@@ -61,14 +57,13 @@ def article_create(request):
         form = ArticleForm(request.POST)
         if form.is_valid():
             article = form.save(commit=False)
-            article.author = request.user # Автоматично підставляємо поточного користувача
+            article.author = request.user 
             article.save()
             return redirect('article_list')
     else:
         form = ArticleForm()
     return render(request, 'blog/article_form.html', {'form': form})
 
-# 5. Видалення статті (Авторизація + Ролі)
 @login_required
 def article_delete(request, pk):
     article = get_object_or_404(Article, pk=pk)
@@ -77,7 +72,6 @@ def article_delete(request, pk):
     article.delete()
     return redirect('article_list')
 
-# 6. Видалення коментаря (Авторизація + Ролі)
 @login_required
 def delete_comment(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
@@ -95,7 +89,6 @@ def category_detail(request, pk):
 
 @login_required
 def profile(request):
-    # Якщо профіль ще не існує (для старих користувачів), створюємо його
     Profile.objects.get_or_create(user=request.user)
     
     if request.method == 'POST':
@@ -115,8 +108,8 @@ def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save() # Зберігаємо користувача (профіль створиться автоматично через сигнал)
-            return redirect('login') # Відправляємо на сторінку входу
+            form.save() 
+            return redirect('login') 
     else:
         form = UserCreationForm()
     return render(request, 'blog/register.html', {'form': form})

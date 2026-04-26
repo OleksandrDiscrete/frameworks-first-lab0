@@ -6,7 +6,7 @@ from .models import Profile
 class ArticleForm(forms.ModelForm):
     class Meta:
         model = Article
-        fields = ['title', 'text', 'category'] # Дозволяємо редагувати лише ці поля
+        fields = ['title', 'text', 'category'] 
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
