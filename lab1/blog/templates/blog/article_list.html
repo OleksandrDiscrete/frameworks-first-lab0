@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Список статей</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="text-primary fw-bold">Всі статті</h1>
+            <div>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'article_create' %}" class="btn btn-success me-2">Написати статтю</a>
+                {% endif %}
+                <a href="{% url 'category_list' %}" class="btn btn-outline-secondary">До категорій</a>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 mb-4 bg-white">
+            <div class="card-body d-flex align-items-center">
+                <strong class="me-3">Сортувати за:</strong>
+                <a href="?sort=date" class="btn btn-sm btn-outline-primary me-2">Датою публікації</a>
+                <a href="?sort=comments" class="btn btn-sm btn-outline-info">Кількістю коментарів</a>
+            </div>
+        </div>
+
+        <div class="row">
+            {% for article in articles %}
+            <div class="col-12 mb-4">
+                <div class="card shadow-sm border-0 border-start border-primary border-4">
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            <a href="{% url 'article_detail' article.pk %}" class="text-decoration-none">{{ article.title }}</a>
+                        </h3>
+                        <div class="text-muted small mb-3">
+                            <span class="me-3">Автор: <b>{{ article.author.username }}</b></span>
+                            <span class="me-3">Дата: {{ article.pub_date|date:"d.m.Y H:i" }}</span>
+                            <span class="badge bg-secondary">Категорія: {{ article.category.name }}</span>
+                        </div>
+                        <p class="card-text">{{ article.text|truncatewords:30 }}</p>
+                        
+                        <hr>
+                        <div class="d-flex justify-content-end">
+                            <span class="text-primary fw-bold">Коментарів: {{ article.comm_count|default:article.comments.count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12"><p class="text-muted">Статей поки немає.</p></div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
